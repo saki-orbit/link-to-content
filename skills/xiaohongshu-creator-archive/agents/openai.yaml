@@ -1,0 +1,3 @@
+interface:
+  display_name: "小红书博主全量归档"
+  short_description: "批量收集博主作品并生成可搜索的本地稿件"

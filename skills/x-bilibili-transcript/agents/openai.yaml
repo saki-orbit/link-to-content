@@ -1,0 +1,3 @@
+interface:
+  display_name: "X / B站单条视频转写"
+  short_description: "复制帖子链接，快速拿到逐字稿和字幕"

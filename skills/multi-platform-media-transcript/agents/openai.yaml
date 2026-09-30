@@ -1,0 +1,3 @@
+interface:
+  display_name: "多平台链接转文字"
+  short_description: "一个或多个媒体链接，直接整理成逐字稿"
