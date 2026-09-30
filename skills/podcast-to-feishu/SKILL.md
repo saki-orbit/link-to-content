@@ -9,13 +9,12 @@ description: "把小宇宙等播客链接整理成逐字稿、结构化精华、
 
 ## 默认交付
 
-飞书文档包含：
+本地标准素材与飞书文档包含：
 
-1. 单集标题、主播/嘉宾、原始链接和日期。
-2. 清理口头填充词后的完整文字稿，保留事实、观点和语气。
-3. 结构化精华：核心结论、关键论据、案例、可执行启发。
-4. 重要观点的时间戳。
-5. Mermaid 思维导图，呈现话题之间的层级关系。
+1. `transcript.md`：清理口头填充词后的完整文字稿，保留事实、观点和语气。
+2. `subtitles.srt`：带时间戳字幕。
+3. `metadata.json` 使用统一字段：`title`、`platform`、`source_url`、`creator`、`published_at`、`duration_seconds`、`language`、`engines`。未知字段设为 `null`。
+4. 飞书文档：结构化精华、重要观点的时间戳和 Mermaid 思维导图。
 
 ## 执行方式
 

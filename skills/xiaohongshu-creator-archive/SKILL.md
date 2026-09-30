@@ -11,9 +11,10 @@ description: "从小红书博主主页批量收集全部作品分享链接，生
 
 在当前项目旁建立“小红书归档/<博主名>/”目录，按作品保存：
 
-- 作品标题、作者、发布时间和原始分享链接。
-- 视频逐字稿与 SRT 字幕。
-- 图文笔记可识别的图片文字。
+- 每篇作品一个独立目录。
+- `metadata.json` 使用统一字段：`title`、`platform`、`source_url`、`creator`、`published_at`、`duration_seconds`、`language`、`engines`。未知字段设为 `null`。
+- 视频：`transcript.md` 逐字稿与 `subtitles.srt` 字幕。
+- 图文：`ocr.md`，按图片顺序整理识别出的文字。
 - index.csv 索引和失败清单。
 
 转写优先使用本机模型，避免把整段音视频发给云端转写服务。Agent 只用识别后的文字做整理。

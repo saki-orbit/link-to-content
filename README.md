@@ -1,89 +1,98 @@
-# 给一个链接，拿到本地内容素材
+<div align="center">
 
-看到一条值得留下的视频或播客？把链接发给 Agent，快速得到可搜索、可复用的文字素材。
+# Link2Content
 
-**不用自己找下载器、抽音轨、转格式、跑转写。链接进来，逐字稿和字幕出来。**
+### 把社交媒体和播客链接，变成 Agent 能直接使用的本地内容。
 
-- **速度快**：本地模型处理音频。作者实测，2 分 48 秒中文口播约 25 秒完成转写。
-- **少花 Token**：语音转写在本机完成，减少云端转写和 Token 消耗。
-- **素材可复用**：逐字稿、带时间戳字幕和来源信息，方便搜索、复盘、剪辑和二次创作。
+[![GitHub stars](https://img.shields.io/github/stars/saki-orbit/link-to-content?style=social)](https://github.com/saki-orbit/link-to-content/stargazers)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## 选择一个 Skill
+**你发链接，拿到逐字稿、字幕和来源信息。**
 
-### 小红书博主作品归档
+</div>
 
-给一个博主主页，把公开作品整理进本地素材库：视频生成逐字稿和字幕，图文提取文字，并生成可搜索索引。
+Agent 可以分析内容，前提是先拿到内容。Link2Content 把下载、抽音轨、转写和素材整理串成一个简单动作：**复制链接，发给 Agent，拿到可搜索、可复用的本地素材。**
 
-主页批量抓取需要小红书登录态。批量流程针对请求和采集做了优化；为稳妥起见，建议使用小号。作者自用大号测试至今没有遇到封禁。单条作品链接不需要登录。
+```mermaid
+flowchart LR
+    A[社交媒体 / 视频 / 播客链接] --> B[Link2Content]
+    B --> C[transcript.md]
+    B --> D[subtitles.srt]
+    B --> E[metadata.json]
+    C --> F[Codex / WorkBuddy / DeepSeek Harness / RAG / 你的工作流]
+    D --> F
+    E --> F
+```
 
-Skill：[xiaohongshu-creator-archive](https://github.com/saki-orbit/link-to-content/tree/main/skills/xiaohongshu-creator-archive)
+## 5 秒看懂
 
-### X / B 站单条视频转写
+```text
+你：把这条 B 站视频整理成 Agent 能用的本地素材：<视频链接>
 
-复制一条 X 或 B 站视频链接，得到逐字稿、带时间戳字幕和来源信息。单条链接处理不需要登录。
+Link2Content：
+  transcript.md    逐字稿
+  subtitles.srt    带时间轴字幕
+  metadata.json    标题、平台、来源和时长
+```
 
-Skill：[x-bilibili-transcript](https://github.com/saki-orbit/link-to-content/tree/main/skills/x-bilibili-transcript)
+## 支持的内容
 
-### 多平台链接转文字
+| 来源 | 单条链接 | 主页归档 | 内容提取 | 主要产物 |
+| --- | --- | --- | --- | --- |
+| 小红书 | 笔记链接 | 博主公开作品 | 视频转写、图文 OCR | 逐篇素材、索引和失败清单 |
+| X | 视频链接 | — | 逐字稿 | `transcript.md`、`subtitles.srt`、`metadata.json` |
+| B 站 | 视频链接 | — | 逐字稿 | `transcript.md`、`subtitles.srt`、`metadata.json` |
+| YouTube 及其他媒体站点 | 音视频链接 | — | 逐字稿 | `transcript.md`、`subtitles.srt`、`metadata.json` |
+| 小宇宙播客 | 单集链接 | — | 逐字稿、精华整理 | 本地素材和飞书文档 |
 
-给一个或多个可访问的 YouTube、X、B 站或其他媒体链接，分别生成逐字稿、字幕和来源信息。单条链接处理不需要登录。
+小红书主页批量归档使用登录态；单条作品链接不需要登录。批量流程做了针对性优化，建议使用小号。作者本人使用大号测试至今没有遇到封禁。
 
-Skill：[multi-platform-media-transcript](https://github.com/saki-orbit/link-to-content/tree/main/skills/multi-platform-media-transcript)
+## 每条内容的标准产物
 
-### 播客精华进飞书
+- `transcript.md`：逐字稿或音频转写。
+- `subtitles.srt`：带时间轴字幕。
+- `metadata.json`：统一描述内容来源，字段为 `title`、`platform`、`source_url`、`creator`、`published_at`、`duration_seconds`、`language` 和 `engines`。无法获取的值写为 `null`。
+- 小红书图文笔记额外生成 `ocr.md`；主页归档额外生成 `index.csv`。
 
-给小宇宙单集链接，生成全文、结构化精华、时间戳和思维导图，并整理进飞书文档。这是单独的播客工作流；其他 Skill 默认专注于标准化文字素材。
+## 为什么用 Link2Content
 
-Skill：[podcast-to-feishu](https://github.com/saki-orbit/link-to-content/tree/main/skills/podcast-to-feishu)
-
-## 标准产物
-
-- 原语言逐字稿
-- 带时间戳字幕
-- 标题、平台、来源链接和时长等基本信息
-- 小红书主页归档：作品目录、`index.csv` 和逐条处理结果
-
-自动分析、钩子提取等内容加工可以在拿到文字后按需提示 Agent；它们不改变默认转写流程。
+- **从链接开始**：不用先找下载器、手动抽音频，再把文件送去转写。
+- **处理快，少花 Token**：语音转写在本机完成。作者实测，2 分 48 秒的中文口播约 25 秒完成转写。
+- **产物能接着用**：逐字稿、字幕、元数据可以直接交给 Codex、WorkBuddy、DeepSeek Harness、RAG 或自己的内容工作流。
+- **平台不绑死**：小红书、X、B 站、YouTube、播客分别有对应 Skill；用户给链接，Agent 负责跑流程。
 
 ## 三步开始使用
 
 ### 1. 选一个 Skill
 
-每个 Skill 目录都能单独安装。比如只想转写 X 或 B 站视频，就选 `x-bilibili-transcript`。
+- [小红书博主作品归档](https://github.com/saki-orbit/link-to-content/tree/main/skills/xiaohongshu-creator-archive)
+- [X / B 站单条转写](https://github.com/saki-orbit/link-to-content/tree/main/skills/x-bilibili-transcript)
+- [多平台链接转文字](https://github.com/saki-orbit/link-to-content/tree/main/skills/multi-platform-media-transcript)
+- [播客精华进飞书](https://github.com/saki-orbit/link-to-content/tree/main/skills/podcast-to-feishu)
 
-### 2. 把 Skill 网页地址发给 Agent
+### 2. 把 Skill 页面地址发给 Agent
 
-发布后，打开对应 Skill 的 GitHub 页面，复制浏览器地址。地址格式如下：
-
-```text
-https://github.com/saki-orbit/link-to-content/tree/main/skills/x-bilibili-transcript
-```
-
-把地址粘贴给 Codex、WorkBuddy 或 DeepSeek Harness，并发送：
+例如，把 [X / B 站转写 Skill](https://github.com/saki-orbit/link-to-content/tree/main/skills/x-bilibili-transcript) 的地址粘贴给 Agent，再说：
 
 > 请安装并启用这个 Skill。安装完成后告诉我怎么调用。
 
-### 3. 直接发内容链接
+### 3. 发内容链接
 
-安装好后，像聊天一样把视频、播客或博主主页链接发给 Agent。例如：
+> 把这个视频转成逐字稿和带时间戳的字幕：`<视频链接>`
 
-> 帮我把这个视频转成逐字稿和带时间戳的字幕：`<视频链接>`
+### Codex、WorkBuddy 和 DeepSeek Harness
 
-也可以说“归档这个小红书博主的公开作品”或“把这期播客整理进飞书”，再贴对应链接。
+- **Codex**：在 Codex 中发送 `$skill-installer install https://github.com/saki-orbit/link-to-content/tree/main/skills/x-bilibili-transcript`。安装后重启 Codex。也可以换成上面的其他 Skill 地址。
+- **WorkBuddy**：把 Skill 页面地址发给 Agent 并要求安装；也可以在“技能 → 添加技能”中导入 Skill 包。详见[WorkBuddy 技能指南](https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Skills-Market)。
+- **DeepSeek Harness**：把仓库地址发给 Agent 并要求安装所需 Skill；也可以在仓库目录运行 `bash scripts/install-to-dsh.sh x-bilibili-transcript`。
 
-### 各 Agent 的安装入口
+## 加入共建
 
-- **Codex**：发送 `$skill-installer install https://github.com/saki-orbit/link-to-content/tree/main/skills/x-bilibili-transcript`。安装后重启 Codex，让它加载新 Skill。
-- **WorkBuddy**：在“技能”中选择“添加技能”，导入 Skill 包；也可以先把 GitHub Skill 地址发给 Agent，按它提示完成安装。官方说明：[WorkBuddy 技能使用指南](https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Skills-Market)。
-- **DeepSeek Harness**：把仓库地址发给 Agent，请它安装所需 Skill；也可以在下载后的仓库目录运行 `bash scripts/install-to-dsh.sh x-bilibili-transcript`。
+觉得 Link2Content 有用？点 Star 支持项目。欢迎提 Issue 分享体验，也欢迎提交 PR 一起完善。
 
-## 作者实测
+## 独立 Skills
 
-2 分 48 秒的中文口播视频，使用本地模型约 25 秒完成转写。实际速度会随素材长度和设备变化。
-
-## 仓库结构
-
-每个目录都是独立 Skill，可按需安装：
+每个目录都能单独安装、单独使用：
 
 - `skills/xiaohongshu-creator-archive`
 - `skills/x-bilibili-transcript`

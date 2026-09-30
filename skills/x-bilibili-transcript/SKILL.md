@@ -9,10 +9,10 @@ description: "把 X/Twitter 或 B 站单条视频链接快速变成逐字稿和�
 
 ## 默认交付
 
-- 保留原语言的逐字稿。
-- 同时生成带时间戳的 SRT 字幕。
-- 记录标题、来源链接和媒体时长。
-- 默认保存在当前项目的“转写结果”目录。
+- 保留原语言的逐字稿，保存为 `transcript.md`。
+- 生成带时间戳的 SRT 字幕，保存为 `subtitles.srt`。
+- `metadata.json` 使用统一字段：`title`、`platform`、`source_url`、`creator`、`published_at`、`duration_seconds`、`language`、`engines`。未知字段设为 `null`。
+- 每条链接单独建立结果目录，默认保存在当前项目的“转写结果”目录。
 
 ## 执行方式
 
