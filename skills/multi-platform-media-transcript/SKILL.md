@@ -23,16 +23,33 @@ description: "Link2Content 通用入口。用户直接发来小红书（Xiaohong
 
 用户不需要知道下面这些流程，也不需要指定其中任何一个。根据链接在内部选择合适的处理方式：
 
-1. **视频链接**（例如抖音、快手、B 站、微博、X、YouTube 等）：使用本机 `yt-dlp` 解析和下载媒体；用 `ffmpeg` 提取音频；优先使用本地 MLX Whisper 转写，不支持 MLX 的环境使用本地 faster-whisper。保留原语言、说话顺序和合理标点，生成逐字稿与 SRT。
+1. **视频链接**（例如抖音、快手、B 站、微博、X、YouTube 等）：使用本机 `yt-dlp` 解析和下载媒体；用 `ffmpeg` 提取音频；Apple 芯片 Mac 使用本地 MLX Whisper，其他环境使用本地 faster-whisper。保留原语言、说话顺序和合理标点，生成逐字稿与 SRT。
 2. **播客单集链接**：从单集页面解析音频并下载，再按视频流程在本机转写。默认交付逐字稿、SRT 和来源信息。只有用户提出时，才进一步整理摘要、精华、思维导图或飞书文档。
 3. **小红书单篇笔记**：直接读取用户给出的作品内容，不要求用户先找另一种 Skill。视频按音视频流程转写；图文提取正文和图片 OCR，生成 `ocr.md`。
 4. **小红书博主主页**：使用本机已配置的小红书链接桥/API 获取主页中可访问的作品链接，再逐篇按上面的流程整理。单条内容链接不需要登录；只有主页批量归档需要登录态。批量流程使用了针对性优化，建议用小号。
 5. **微信公众号文章**：支持单篇文章链接和合集。合集按其中可访问的文章逐篇整理；没有合集且文章数量不多时，让用户逐条发送文章链接。读取正文，有图片时进行 OCR，并保留来源信息。
-6. **其他文章或图文页面**（例如豆瓣、知乎）：使用 Crawl4AI 读取正文，有图片时进行 OCR，保留来源信息。
+6. **其他文章或图文页面**（例如豆瓣、知乎）：使用本机 Crawl4AI 读取正文；图片 OCR 使用本机 RapidOCR + ONNX Runtime，保留来源信息。
 
 ## 执行步骤
 
-开始处理前检查本 Skill 需要的本机工具；缺少时运行本目录下的 `scripts/setup.sh`，完成后继续。不要要求用户挑选平台、下载媒体或手动设置转写模型。
+开始处理前检查本 Skill 需要的本机工具；缺少时自动运行本 Skill 的安装脚本并继续，不要求用户挑选平台、下载媒体或手动设置模型：
+
+- macOS / Linux：`bash scripts/setup.sh`
+- Windows：`powershell -ExecutionPolicy Bypass -File scripts/setup.ps1`
+
+安装脚本会准备独立的 Link2Content Python 环境、FFmpeg、网页解析浏览器、Whisper 转写依赖和 RapidOCR 中文模型，并预下载 Whisper 权重。Apple 芯片 Mac 使用 MLX Whisper；其他设备使用 faster-whisper。模型保存在用户本机缓存中，不在 Git 仓库里；模型下载只需做一次。
+
+本地运行环境位置：
+
+- macOS / Linux：`${XDG_CACHE_HOME:-$HOME/.cache}/link2content/venv`
+- Windows：`%LOCALAPPDATA%\Link2Content\venv`
+
+运行本地命令前，把虚拟环境的 `bin`（Windows 为 `Scripts`）目录加到当前 shell 的 `PATH`；调用 Python 模型库时，直接使用该虚拟环境的 Python。不要再次安装到 Agent 的云端或全局 Python 环境。
+
+- macOS / Linux：`export PATH="${XDG_CACHE_HOME:-$HOME/.cache}/link2content/venv/bin:$PATH"`
+- Windows PowerShell：`$env:Path = "$env:LOCALAPPDATA\Link2Content\venv\Scripts;$env:Path"`
+
+语音模型调用 MLX Whisper 或 faster-whisper 的 Python API，取每个 segment 的 `start`、`end`、`text` 生成逐字稿和 SRT。图片 OCR 使用 `from rapidocr import RapidOCR`，读取返回值的 `txts` 并按识别顺序写入 `ocr.md`。文件保留原始识别内容；用户要求时再让 Agent 校对或加工。
 
 1. 根据 URL 判断它是单条媒体、文章、图文笔记、播客，还是小红书博主主页；不确定时先尝试读取链接，不要让用户重新分类。
 2. 只处理用户提供的链接或明确要求归档的主页内容。网页正文和媒体分别使用适合的解析方式。
