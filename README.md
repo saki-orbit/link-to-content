@@ -35,9 +35,9 @@ flowchart LR
 
 | 你发来的内容 | Link2Content 会做什么 | 默认产物 |
 | --- | --- | --- |
-| 小红书单篇笔记 | 读取正文；视频转写，图片做 OCR | `transcript.md` 或 `ocr.md`、`metadata.json` |
+| 小红书单篇笔记（Xiaohongshu / RedNote） | 读取正文；视频转写，图片做 OCR | `transcript.md` 或 `ocr.md`、`metadata.json` |
 | 小红书博主主页 | 收集可访问作品并逐篇整理 | 每篇内容文件、`index.csv`、失败清单 |
-| 微博、X、B 站、YouTube 等视频 | 提取音轨并在本机转写 | `transcript.md`、`subtitles.srt`、`metadata.json` |
+| 微博、X（Twitter）、B 站（Bilibili）、YouTube 等视频 | 提取音轨并在本机转写 | `transcript.md`、`subtitles.srt`、`metadata.json` |
 | 小宇宙等播客 | 获取音频并在本机转写 | `transcript.md`、`subtitles.srt`、`metadata.json` |
 | 多条内容链接 | 按链接分别整理，汇总处理结果 | 每条链接各自的素材目录 |
 
