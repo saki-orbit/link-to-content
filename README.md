@@ -37,9 +37,13 @@ flowchart LR
 | --- | --- | --- |
 | 小红书单篇笔记（Xiaohongshu / RedNote） | 读取正文；视频转写，图片做 OCR | `transcript.md` 或 `ocr.md`、`metadata.json` |
 | 小红书博主主页 | 收集可访问作品并逐篇整理 | 每篇内容文件、`index.csv`、失败清单 |
-| 微博、X（Twitter）、B 站（Bilibili）、YouTube 等视频 | 提取音轨并在本机转写 | `transcript.md`、`subtitles.srt`、`metadata.json` |
+| 抖音（Douyin）、快手（Kuaishou）、B 站（Bilibili）、微博（Weibo）、X（Twitter）、YouTube 视频 | 提取音轨并在本机转写 | `transcript.md`、`subtitles.srt`、`metadata.json` |
+| 豆瓣（Douban）、知乎（Zhihu）帖子或文章 | 读取正文；有图片时做 OCR | 正文、`ocr.md`、`metadata.json` |
+| 微信公众号文章（单篇 / 合集） | 读取文章正文；按合集逐篇整理，有图片时做 OCR | 正文、`ocr.md`、`metadata.json` |
 | 小宇宙等播客 | 获取音频并在本机转写 | `transcript.md`、`subtitles.srt`、`metadata.json` |
 | 多条内容链接 | 按链接分别整理，汇总处理结果 | 每条链接各自的素材目录 |
+
+公众号文章可以直接发单篇链接，也可以发合集；没有合集、文章数量又不多时，逐条发送文章链接即可。
 
 小红书单篇作品不需要登录；博主主页批量归档需要登录态。批量流程做过优化，我建议用小号；我自己用大号测试至今没有遇到封禁。
 
@@ -59,7 +63,7 @@ flowchart LR
 请帮我安装并启用这个 Skill：
 https://github.com/saki-orbit/link-to-content/tree/main/skills/multi-platform-media-transcript
 
-安装好之后，我会直接把小红书、微博、X、B站、YouTube、播客等内容链接发给你。请自动判断平台和内容类型，使用 Link2Content 处理，不要让我先选择对应的平台 Skill。默认把逐字稿、SRT 字幕、来源信息和图文 OCR 整理成文件，保存在本地。安装完成后告诉我，之后直接发链接就可以。
+安装好之后，我会直接把小红书、抖音、快手、B站、微博、豆瓣、知乎、微信公众号、X、YouTube、播客等内容链接发给你。请自动判断平台和内容类型，使用 Link2Content 处理，不要让我先选择对应的平台 Skill。公众号文章可以发单篇链接或合集；没有合集且数量不多时，我会逐条发送链接。默认把逐字稿、SRT 字幕、来源信息和图文 OCR 整理成文件，保存在本地。安装完成后告诉我，之后直接发链接就可以。
 ```
 
 之后就直接发链接，或者顺手说你希望拿到什么：
