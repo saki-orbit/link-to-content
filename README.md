@@ -95,23 +95,15 @@ Link2Content 想先解决一个我自己遇到的问题：把选中的内容留�
 
 ## 安装一次，以后直接发链接
 
-把下面这段话发给你常用的 Agent。它会安装 Skill、运行里面的本地环境安装脚本，并把 Whisper 和 OCR 模型准备好：
+把这句话发给你的 Agent：
 
 ```text
-请帮我安装并启用 Link2Content 这个 Skill：
-https://github.com/saki-orbit/link-to-content/tree/main/skills/multi-platform-media-transcript
-请把这个 Skill 文件夹及其 scripts 一起安装。安装完成后，自动运行 Skill 自带的本地环境安装脚本，安装转写、OCR、网页解析依赖并预下载模型；等脚本确认成功后再告诉我。之后我会直接发内容链接，请自动识别平台和内容类型，用 Link2Content 整理成逐字稿、字幕、正文或 OCR 文件，保存在本地。不要让我先选平台或 Skill。
+帮我安装并启用 Link2Content，自动准备好它需要的本地依赖和模型：https://github.com/saki-orbit/link-to-content/tree/main/skills/multi-platform-media-transcript
 ```
 
-之后就直接发链接，或者顺手说你希望拿到什么：
+装好后，直接把链接发给 Agent：
 
 > https://…… 帮我转成逐字稿和带时间轴的字幕。
-
-### 常见 Agent 怎么安装
-
-- **Codex**：发送 `$skill-installer install https://github.com/saki-orbit/link-to-content/tree/main/skills/multi-platform-media-transcript`，安装后重启 Codex。
-- **WorkBuddy**：把上面的安装说明和 Skill 地址发给 Agent；也可以在“技能 → 添加技能”中导入。可参考 [WorkBuddy 技能指南](https://www.workbuddy.cn/docs/workbuddy/From-Beginner-to-Expert-Guide/Function-Description/Skills-Market)。
-- **DeepSeek Harness**：把上面的安装说明和仓库地址发给 Agent；如果你已经克隆仓库，也可以运行 `bash scripts/install-to-dsh.sh multi-platform-media-transcript`。
 
 ## 几种用法
 
