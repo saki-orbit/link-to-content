@@ -4,7 +4,7 @@
 
 ### 把链接发给 Agent，整理成可以继续用的本地内容素材。
 
-[![GitHub stars](https://img.shields.io/github/stars/saki-orbit/link-to-content?style=social)](https://github.com/saki-orbit/link-to-content/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/saki-orbit/link-to-content?style=flat)](https://github.com/saki-orbit/link-to-content/stargazers)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 </div>
