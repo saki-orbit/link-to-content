@@ -41,7 +41,7 @@ if (-not (Test-Path $Python)) {
 }
 
 Write-Step '正在安装 Link2Content 的本地媒体、OCR 和网页解析组件。'
-uv pip install --python $Python yt-dlp crawl4ai 'rapidocr>=3.7.0' onnxruntime 'huggingface_hub[hf_xet]' faster-whisper
+uv pip install --python $Python yt-dlp crawl4ai 'rapidocr>=3.7.0' onnxruntime huggingface_hub hf_xet faster-whisper
 if ($LASTEXITCODE -ne 0) { throw '本地依赖安装失败。' }
 
 $CrawlSetup = Join-Path $VenvDir 'Scripts\crawl4ai-setup.exe'

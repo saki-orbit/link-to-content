@@ -64,7 +64,7 @@ fi
 PYTHON="$VENV_DIR/bin/python"
 
 say "正在安装 Link2Content 的本地媒体、OCR 和网页解析组件。"
-uv pip install --python "$PYTHON" yt-dlp crawl4ai 'rapidocr>=3.7.0' onnxruntime 'huggingface_hub[hf_xet]'
+uv pip install --python "$PYTHON" yt-dlp crawl4ai 'rapidocr>=3.7.0' onnxruntime huggingface_hub hf_xet
 
 if [ "$SYSTEM" = "Darwin" ] && [ "$ARCH" = "arm64" ]; then
   say "检测到 Apple 芯片：安装 MLX Whisper。"

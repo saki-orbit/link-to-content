@@ -98,12 +98,12 @@ Link2Content 想先解决一个我自己遇到的问题：把选中的内容留�
 把这句话发给你的 Agent：
 
 ```text
-帮我安装并启用 Link2Content，自动准备好它需要的本地依赖和模型：https://github.com/saki-orbit/link-to-content/tree/main/skills/multi-platform-media-transcript
+帮我安装并启用 Link2Content：https://github.com/saki-orbit/link-to-content/tree/main/skills/multi-platform-media-transcript
 ```
 
 装好后，直接把链接发给 Agent：
 
-> https://…… 帮我转成逐字稿和带时间轴的字幕。
+> https://…… 帮我转成逐字稿。
 
 ## 几种用法
 
