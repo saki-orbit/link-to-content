@@ -44,16 +44,34 @@ description: "Link2Content 通用入口。用户直接发来小红书（Xiaohong
 - macOS / Linux：`${XDG_CACHE_HOME:-$HOME/.cache}/link2content/venv`
 - Windows：`%LOCALAPPDATA%\Link2Content\venv`
 
-运行本地命令前，把虚拟环境的 `bin`（Windows 为 `Scripts`）目录加到当前 shell 的 `PATH`；调用 Python 模型库时，直接使用该虚拟环境的 Python。不要再次安装到 Agent 的云端或全局 Python 环境。
+### 视频和播客的固定转写路径
 
-- macOS / Linux：`export PATH="${XDG_CACHE_HOME:-$HOME/.cache}/link2content/venv/bin:$PATH"`
-- Windows PowerShell：`$env:Path = "$env:LOCALAPPDATA\Link2Content\venv\Scripts;$env:Path"`
+这段流程已经写进随 Skill 安装的脚本。**必须调用它，不要自己临时写 `transcribe.py`，不要改用 Agent 的语音识别或临时调用 Python API。**
 
-语音模型调用 MLX Whisper 或 faster-whisper 的 Python API，取每个 segment 的 `start`、`end`、`text` 生成逐字稿和 SRT。图片 OCR 使用 `from rapidocr import RapidOCR`，读取返回值的 `txts` 并按识别顺序写入 `ocr.md`。文件保留原始识别内容；用户要求时再让 Agent 校对或加工。
+1. 用该平台已配置的解析方式下载用户给出的媒体，记录下载到的本地文件路径。
+2. 找到当前 Skill 的安装目录，将其绝对路径记为 `SKILL_DIR`。为这条内容建立结果目录 `OUTPUT_DIR`。
+3. 调用随 Skill 安装的固定转写脚本：
+
+   macOS / Linux：
+
+   ```bash
+   python "$SKILL_DIR/scripts/transcribe_audio.py" \
+     --input "/absolute/path/to/downloaded-media" \
+     --output-dir "/absolute/path/to/output-dir" \
+     --language zh
+   ```
+
+   中文内容传 `--language zh`；已知其他语言时传对应语言代码；语言不确定时省略 `--language` 让模型自动识别。Windows 使用同一个参数格式，通过 `py` 或本地 Python 启动脚本。
+
+4. 等脚本返回成功后，检查 `OUTPUT_DIR/transcript.md` 和 `OUTPUT_DIR/subtitles.srt` 已生成。将可获取的标题、平台、原始链接、作者、发布时间和时长写入 `metadata.json`；取不到的字段写 `null`。
+
+Apple 芯片 Mac 上，脚本按 DSH 已验证的命令行路径运行：FFmpeg 转为 16 kHz 单声道 WAV，再调用 Skill 本机环境中的 `mlx_whisper`，使用 `mlx-community/whisper-large-v3-turbo` 和 `--output-format all`。权重在安装时下载到本机缓存，转写时由本机进程加载。其他设备由同一脚本调用已安装的 faster-whisper CPU int8 后端。两种情况都不需要 Agent 自己拼接转写程序。
+
+图片 OCR 使用本地 RapidOCR，读取返回的 `txts` 并按识别顺序写入 `ocr.md`。文件保留原始识别内容；用户要求时再让 Agent 校对或加工。
 
 1. 根据 URL 判断它是单条媒体、文章、图文笔记、播客，还是小红书博主主页；不确定时先尝试读取链接，不要让用户重新分类。
 2. 只处理用户提供的链接或明确要求归档的主页内容。网页正文和媒体分别使用适合的解析方式。
-3. 音视频使用本地 Whisper 转写；不要把整段媒体上传到云端转写服务。
+3. 视频和播客严格按上面的固定脚本转写。脚本正在运行时不要重复启动第二份转写进程；较长音频等待期间会定时输出运行状态。
 4. 默认只整理原始内容和标准元数据。保留原意，不凭空补写；听不清的片段标为“听不清”。用户提出时再做摘要、内容拆解或二次创作。
 5. 将每条内容保存到单独目录，完成后直接给出结果位置和处理情况。
 

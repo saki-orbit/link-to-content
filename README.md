@@ -51,7 +51,7 @@ flowchart LR
 
 ### 2.2 成本低，速度快
 
-视频转写和图片 OCR 都由本地小模型处理，不把整段媒体交给云端模型，这两步不消耗 Agent Token。安装时会自动准备本地依赖和模型：Apple 芯片 Mac 使用 MLX Whisper，其他设备使用 faster-whisper；图片识别使用 RapidOCR。Whisper 权重只需下载一次，缓存在本机复用。Apple 芯片语音模型约 1.6 GB。
+视频转写和图片 OCR 都由本地小模型处理，不把整段媒体交给云端模型，这两步不消耗 Agent Token。安装时会自动准备本地依赖和模型：Apple 芯片 Mac 使用固定的 FFmpeg → `mlx_whisper` 命令行流程，和我在 DSH 里跑通的路径一致；其他设备使用 faster-whisper；图片识别使用 RapidOCR。转写脚本随 Skill 一起安装，Agent 不用临时拼代码。Whisper 权重只需下载一次，缓存在本机复用。Apple 芯片语音模型约 1.6 GB。
 
 我实测一条 3 分钟左右的视频，大约 8 秒得到 Markdown 逐字稿，成本约 8 分钱。
 
