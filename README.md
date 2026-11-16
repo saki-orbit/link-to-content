@@ -150,6 +150,17 @@ DSH 的约定很简单：Skill 就是一个带 `SKILL.md` 的目录，放进它�
 bash scripts/install-to-dsh.sh multi-platform-media-transcript
 ```
 
+### 用插件包形态安装（可选）
+
+上面的方式是「把 Skill 目录放进 DSH 会扫描的位置」，不注册任何插件。如果你希望 Link2Content 出现在 DSH 的插件列表里，可以用 npm 包形态：
+
+- 本地仓库：**Plugins** → **Add plugin** 选本仓库目录，或 `plugin_manager install_bundle /path/to/link-to-content`
+- 发布到 npm 之后：按包名 `link2content` 安装
+
+装好后四个 Skill 一次性可用：`multi-platform-media-transcript`、`xiaohongshu-creator-archive`、`x-bilibili-transcript`、`podcast-to-feishu`；在 **Plugins** 里移除即可卸载。
+
+`l2c` 和 `install.sh` 两种形态与插件包互不冲突，按习惯任选。
+
 按 DSH 的用法对齐的几处细节：
 
 - Skill 落在 `~/.dsh/skills/<skill-name>/`，DSH 启动时自动发现；新增、改名、删除都会热更新，不用重启
