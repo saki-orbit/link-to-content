@@ -106,32 +106,48 @@ flowchart LR
 
 ## 安装和使用教程
 
-把这句话发给你的 Agent：
+一条命令装好（macOS / Linux）：
 
-```text
-帮我安装并启用 Link2Content：https://github.com/saki-orbit/link-to-content/tree/main/skills/multi-platform-media-transcript
+```bash
+curl -fsSL https://raw.githubusercontent.com/saki-orbit/link-to-content/main/install.sh | bash
 ```
 
-装好后，直接把链接发给 Agent：
+它会下载仓库、建好本地 Python 环境和模型、把 Skill 装进 `~/.dsh/skills`，并留给你一个 `l2c` 命令。装完两种用法都行：
+
+```bash
+l2c https://……                # 终端直接抓，结果写在当前目录
+```
+
+或者新开一个 Agent 会话，把链接发过去：
 
 > https://…… 帮我转成逐字稿。
+
+也可以把安装整个交给 Agent：
+
+```text
+帮我安装并启用 Link2Content：https://github.com/saki-orbit/link-to-content
+```
+
+`l2c` 常用的几条：
+
+| 命令 | 作用 |
+| --- | --- |
+| `l2c install` | 装好环境并把 Skill 装进 `~/.dsh/skills`，顺带软链 `l2c` |
+| `l2c install --target agents` | 同时装到 `~/.agents/skills`，给其他 Agent 共用 |
+| `l2c install --target project` | 只装到当前项目的 `.dsh/skills` |
+| `l2c doctor` | 检查 venv、OCR、转写、ffmpeg 和 DSH 安装状态 |
+| `l2c <链接> --out 目录` | 指定输出目录；`--keep-images` 保留原图 |
 
 ### 已适配 DeepSeek Harness（DSH）
 
 本项目在 DeepSeek Harness 桌面版（0.2.x）上实际跑通过：小红书图文 OCR、文章正文、视频与播客转写都能直接出本地文件，原文不塞回对话。
 
-DSH 的约定很简单：Skill 就是一个带 `SKILL.md` 的目录，放进它扫描的根目录就会被发现，`~/.dsh/skills` 正是其中之一。所以安装只有一步：
+DSH 的约定很简单：Skill 就是一个带 `SKILL.md` 的目录，放进它扫描的根目录就会被发现，`~/.dsh/skills` 正是其中之一 —— 也就是上面那条 `install.sh` / `l2c install` 默认安装的位置，所以装完直接可用。
+
+已经是仓库副本的人，也可以只跑安装脚本：
 
 ```bash
-git clone https://github.com/saki-orbit/link-to-content.git
-cd link-to-content
 bash scripts/install-to-dsh.sh multi-platform-media-transcript
-```
-
-装完新开一个会话，直接把链接发过去即可。也可以把安装这件事交给 DSH 里的 Agent：
-
-```text
-帮我安装并启用 Link2Content：https://github.com/saki-orbit/link-to-content
 ```
 
 按 DSH 的用法对齐的几处细节：
