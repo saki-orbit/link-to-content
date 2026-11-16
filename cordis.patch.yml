@@ -1,0 +1,3 @@
+- insert:
+    - id: link2content
+      name: './lib/index.js'

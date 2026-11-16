@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-DEST_BASE="$HOME/.dsh/skills"
+DEST_BASE="${DSH_SKILLS_DIR:-$HOME/.dsh/skills}"
 SKILL_ONE="xiaohongshu-creator-archive"
 SKILL_TWO="x-bilibili-transcript"
 SKILL_THREE="multi-platform-media-transcript"
@@ -14,6 +14,9 @@ usage() {
   bash scripts/install-to-dsh.sh <skill-name>
   bash scripts/install-to-dsh.sh --all
   bash scripts/install-to-dsh.sh --skip-setup <skill-name>
+  bash scripts/install-to-dsh.sh --dest <目录> <skill-name>
+
+默认安装到 ~/.dsh/skills；可用 --dest 或环境变量 DSH_SKILLS_DIR 指定其他目录。
 
 可选 Skill：
   xiaohongshu-creator-archive
@@ -24,10 +27,25 @@ EOF
 }
 
 SKIP_SETUP="0"
-if [ "$#" -gt 0 ] && [ "$1" = "--skip-setup" ]; then
-  SKIP_SETUP="1"
-  shift
-fi
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --skip-setup)
+      SKIP_SETUP="1"
+      shift
+      ;;
+    --dest)
+      if [ "$#" -lt 2 ]; then
+        usage >&2
+        exit 2
+      fi
+      DEST_BASE="$2"
+      shift 2
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
 
 install_one() {
   local skill_name="$1"

@@ -1,0 +1,40 @@
+{
+  "name": "link2content",
+  "version": "0.1.0",
+  "description": "把链接发给 Agent 或终端，拿到本地逐字稿、字幕、正文和图片 OCR。",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "l2c": "bin/l2c",
+    "link2content": "bin/l2c"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saki-orbit/link-to-content.git"
+  },
+  "files": [
+    "bin",
+    "lib",
+    "skills",
+    "scripts",
+    "install.sh",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "*",
+    "@deepseek-ai/dsh-skill": "*"
+  }
+}
