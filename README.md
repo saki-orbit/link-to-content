@@ -6,6 +6,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/saki-orbit/link-to-content?style=flat)](https://github.com/saki-orbit/link-to-content/stargazers)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![DeepSeek Harness](https://img.shields.io/badge/DeepSeek%20Harness-%E5%B7%B2%E9%80%82%E9%85%8D-4B6BFB)](https://github.com/saki-orbit/link-to-content#%E5%B7%B2%E9%80%82%E9%85%8D-deepseek-harnessdsh)
 
 </div>
 
@@ -114,6 +115,33 @@ flowchart LR
 装好后，直接把链接发给 Agent：
 
 > https://…… 帮我转成逐字稿。
+
+### 已适配 DeepSeek Harness（DSH）
+
+本项目在 DeepSeek Harness 桌面版（0.2.x）上实际跑通过：小红书图文 OCR、文章正文、视频与播客转写都能直接出本地文件，原文不塞回对话。
+
+DSH 的约定很简单：Skill 就是一个带 `SKILL.md` 的目录，放进它扫描的根目录就会被发现，`~/.dsh/skills` 正是其中之一。所以安装只有一步：
+
+```bash
+git clone https://github.com/saki-orbit/link-to-content.git
+cd link-to-content
+bash scripts/install-to-dsh.sh multi-platform-media-transcript
+```
+
+装完新开一个会话，直接把链接发过去即可。也可以把安装这件事交给 DSH 里的 Agent：
+
+```text
+帮我安装并启用 Link2Content：https://github.com/saki-orbit/link-to-content
+```
+
+按 DSH 的用法对齐的几处细节：
+
+- Skill 落在 `~/.dsh/skills/<skill-name>/`，DSH 启动时自动发现；新增、改名、删除都会热更新，不用重启
+- 本地依赖装在自己的 venv（`~/.cache/link2content/venv`），不改动 DSH 自身的运行环境
+- 结果写文件、只回一条状态和路径，不给 DSH 会话堆上下文
+- 想按项目隔离而不是装成用户级，把 `skills/<skill-name>` 放进项目的 `.dsh/skills/` 即可
+
+其他支持 `SKILL.md` 约定的 Agent，把这个目录放进各自的 skills 根目录即可。
 
 ## 几种用法（持续更新中）
 
