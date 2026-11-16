@@ -6,6 +6,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/saki-orbit/link-to-content?style=flat)](https://github.com/saki-orbit/link-to-content/stargazers)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![DeepSeek Harness](https://img.shields.io/badge/DeepSeek%20Harness-%E5%B7%B2%E9%80%82%E9%85%8D-4B6BFB)](https://github.com/saki-orbit/link-to-content#%E5%B7%B2%E9%80%82%E9%85%8D-deepseek-harnessdsh)
 
 </div>
 
@@ -105,15 +106,69 @@ flowchart LR
 
 ## 安装和使用教程
 
-把这句话发给你的 Agent：
+一条命令装好（macOS / Linux）：
 
-```text
-帮我安装并启用 Link2Content：https://github.com/saki-orbit/link-to-content/tree/main/skills/multi-platform-media-transcript
+```bash
+curl -fsSL https://raw.githubusercontent.com/saki-orbit/link-to-content/main/install.sh | bash
 ```
 
-装好后，直接把链接发给 Agent：
+它会下载仓库、建好本地 Python 环境和模型、把 Skill 装进 `~/.dsh/skills`，并留给你一个 `l2c` 命令。装完两种用法都行：
+
+```bash
+l2c https://……                # 终端直接抓，结果写在当前目录
+```
+
+或者新开一个 Agent 会话，把链接发过去：
 
 > https://…… 帮我转成逐字稿。
+
+也可以把安装整个交给 Agent：
+
+```text
+帮我安装并启用 Link2Content：https://github.com/saki-orbit/link-to-content
+```
+
+`l2c` 常用的几条：
+
+| 命令 | 作用 |
+| --- | --- |
+| `l2c install` | 装好环境并把 Skill 装进 `~/.dsh/skills`，顺带软链 `l2c` |
+| `l2c install --target agents` | 同时装到 `~/.agents/skills`，给其他 Agent 共用 |
+| `l2c install --target project` | 只装到当前项目的 `.dsh/skills` |
+| `l2c doctor` | 检查 venv、OCR、转写、ffmpeg 和 DSH 安装状态 |
+| `l2c <链接> --out 目录` | 指定输出目录；`--keep-images` 保留原图 |
+
+### 已适配 DeepSeek Harness（DSH）
+
+本项目在 DeepSeek Harness 桌面版（0.2.x）上实际跑通过：小红书图文 OCR、文章正文、视频与播客转写都能直接出本地文件，原文不塞回对话。
+
+DSH 的约定很简单：Skill 就是一个带 `SKILL.md` 的目录，放进它扫描的根目录就会被发现，`~/.dsh/skills` 正是其中之一 —— 也就是上面那条 `install.sh` / `l2c install` 默认安装的位置，所以装完直接可用。
+
+已经是仓库副本的人，也可以只跑安装脚本：
+
+```bash
+bash scripts/install-to-dsh.sh multi-platform-media-transcript
+```
+
+### 用插件包形态安装（可选）
+
+上面的方式是「把 Skill 目录放进 DSH 会扫描的位置」，不注册任何插件。如果你希望 Link2Content 出现在 DSH 的插件列表里，可以用 npm 包形态：
+
+- 本地仓库：**Plugins** → **Add plugin** 选本仓库目录，或 `plugin_manager install_bundle /path/to/link-to-content`
+- 发布到 npm 之后：按包名 `link2content` 安装
+
+装好后四个 Skill 一次性可用：`multi-platform-media-transcript`、`xiaohongshu-creator-archive`、`x-bilibili-transcript`、`podcast-to-feishu`；在 **Plugins** 里移除即可卸载。
+
+`l2c` 和 `install.sh` 两种形态与插件包互不冲突，按习惯任选。
+
+按 DSH 的用法对齐的几处细节：
+
+- Skill 落在 `~/.dsh/skills/<skill-name>/`，DSH 启动时自动发现；新增、改名、删除都会热更新，不用重启
+- 本地依赖装在自己的 venv（`~/.cache/link2content/venv`），不改动 DSH 自身的运行环境
+- 结果写文件、只回一条状态和路径，不给 DSH 会话堆上下文
+- 想按项目隔离而不是装成用户级，把 `skills/<skill-name>` 放进项目的 `.dsh/skills/` 即可
+
+其他支持 `SKILL.md` 约定的 Agent，把这个目录放进各自的 skills 根目录即可。
 
 ## 几种用法（持续更新中）
 

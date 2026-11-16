@@ -1,0 +1,174 @@
+#!/usr/bin/env bash
+# l2c — Link2Content: install the skill or run one link from the terminal.
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SKILL_NAME="multi-platform-media-transcript"
+SKILL_DIR="$ROOT/skills/$SKILL_NAME"
+CACHE_ROOT="${XDG_CACHE_HOME:-$HOME/.cache}/link2content"
+PY="$CACHE_ROOT/venv/bin/python"
+
+say() { printf '[l2c] %s\n' "$*"; }
+die() { printf '[l2c] %s\n' "$*" >&2; exit 1; }
+
+usage() {
+  cat <<'EOF'
+用法：
+  l2c <链接> [--out 目录] [--keep-images]   抓一个链接，结果写到本地
+  l2c install [--target dsh|agents|project|all] [--skip-setup] [--force] [--no-link]
+  l2c doctor                               检查本地环境
+  l2c version
+
+install 装到哪里：
+  dsh       ${DSH_HOME:-~/.dsh}/skills      DeepSeek Harness 的用户级 Skill 目录
+  agents    ${AGENTS_HOME:-~/.agents}/skills
+  project   ./.dsh/skills                   当前项目
+  all       dsh + agents
+
+视频、播客会先下载再本地转写；小红书图文走图片 OCR。两种都用本地模型，不上传内容。
+EOF
+}
+
+need_python() {
+  if [ ! -x "$PY" ]; then
+    die "本地环境还没装好：先运行 l2c install（或 bash skills/$SKILL_NAME/scripts/setup.sh）"
+  fi
+}
+
+target_dir() {
+  case "$1" in
+    dsh) printf '%s\n' "${DSH_HOME:-$HOME/.dsh}/skills" ;;
+    agents) printf '%s\n' "${AGENTS_HOME:-$HOME/.agents}/skills" ;;
+    project) printf '%s\n' "$PWD/.dsh/skills" ;;
+    *) die "未知 target：$1" ;;
+  esac
+}
+
+cmd_install() {
+  local target="auto" skip_setup=0 force=0 link=1
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --target)
+        [ "$#" -ge 2 ] || die "--target 需要参数"
+        target="$2"
+        shift 2
+        ;;
+      --skip-setup) skip_setup=1; shift ;;
+      --force) force=1; shift ;;
+      --no-link) link=0; shift ;;
+      *) die "install 不认识的参数：$1" ;;
+    esac
+  done
+  [ -f "$SKILL_DIR/SKILL.md" ] || die "找不到 Skill 目录：$SKILL_DIR"
+
+  if [ "$skip_setup" -eq 0 ]; then
+    say "准备本地环境（首次会下载转写和 OCR 模型，约 1.6 GB）"
+    bash "$SKILL_DIR/scripts/setup.sh"
+  fi
+
+  local targets=()
+  case "$target" in
+    auto|dsh) targets=("dsh") ;;
+    all) targets=("dsh" "agents") ;;
+    agents|project) targets=("$target") ;;
+    *) die "未知 target：$target" ;;
+  esac
+
+  local kind dest
+  for kind in "${targets[@]}"; do
+    dest="$(target_dir "$kind")/$SKILL_NAME"
+    mkdir -p "$(dirname "$dest")"
+    if [ -e "$dest" ] && [ "$force" -eq 0 ]; then
+      say "已存在，跳过：${dest}（要覆盖加 --force）"
+      continue
+    fi
+    rm -rf "$dest"
+    cp -R "$SKILL_DIR" "$dest"
+    say "已安装：$dest"
+  done
+
+  if [ "$link" -eq 1 ]; then
+    mkdir -p "$HOME/.local/bin"
+    ln -sf "$ROOT/bin/l2c" "$HOME/.local/bin/l2c"
+    say "终端命令已就绪：$HOME/.local/bin/l2c"
+    case ":$PATH:" in
+      *":$HOME/.local/bin:"*) ;;
+      *) say "提示：$HOME/.local/bin 不在 PATH 里，加进去后就能直接敲 l2c" ;;
+    esac
+  fi
+
+  say "完成。新开一个 Agent 会话发链接，或在终端用：l2c <链接>"
+}
+
+cmd_run() {
+  local url="" out="" keep=0
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --out)
+        [ "$#" -ge 2 ] || die "--out 需要参数"
+        out="$2"
+        shift 2
+        ;;
+      --keep-images) keep=1; shift ;;
+      *) url="$1"; shift ;;
+    esac
+  done
+  [ -n "$url" ] || die "缺少链接；看用法：l2c --help"
+  need_python
+
+  if printf '%s' "$url" | grep -qi 'xiaohongshu\.com'; then
+    say "小红书链接：渲染页面 + 图片 OCR"
+    local args=("--url" "$url")
+    [ -n "$out" ] && args+=("--out" "$out")
+    [ "$keep" -eq 1 ] && args+=("--keep-images")
+    exec "$PY" "$SKILL_DIR/scripts/fetch_image_post.py" "${args[@]}"
+  fi
+
+  say "其他链接：下载 + 本地转写"
+  local manifest
+  manifest="$(mktemp -t l2c-manifest)"
+  printf '{"items": [{"url": "%s"}]}\n' "$url" >"$manifest"
+  local args=("--manifest" "$manifest")
+  [ -n "$out" ] && args+=("--output-root" "$out")
+  "$PY" "$SKILL_DIR/scripts/process_media.py" "${args[@]}"
+  rm -f "$manifest"
+}
+
+cmd_doctor() {
+  say "仓库：$ROOT"
+  if [ -x "$PY" ]; then
+    say "venv：$PY"
+    "$PY" - <<'PY'
+import importlib
+for name in ("crawl4ai", "rapidocr", "requests", "yt_dlp"):
+    try:
+        importlib.import_module(name)
+        print(f"  {name}: OK")
+    except Exception:
+        print(f"  {name}: 缺失")
+PY
+  else
+    say "venv：未安装（运行 l2c install）"
+  fi
+  if command -v ffmpeg >/dev/null 2>&1; then
+    say "ffmpeg：$(command -v ffmpeg)"
+  else
+    say "ffmpeg：缺失（视频和播客需要）"
+  fi
+  if [ -f "${DSH_HOME:-$HOME/.dsh}/skills/$SKILL_NAME/SKILL.md" ]; then
+    say "DeepSeek Harness：已安装 Skill"
+  else
+    say "DeepSeek Harness：未安装（运行 l2c install）"
+  fi
+  if [ -L "$HOME/.local/bin/l2c" ]; then
+    say "终端命令：$HOME/.local/bin/l2c"
+  fi
+}
+
+case "${1:-}" in
+  "" | -h | --help | help) usage ;;
+  install) shift; cmd_install "$@" ;;
+  doctor) shift; cmd_doctor ;;
+  version) printf 'l2c %s\n' "$(git -C "$ROOT" describe --tags --always 2>/dev/null || echo dev)" ;;
+  *) cmd_run "$@" ;;
+esac

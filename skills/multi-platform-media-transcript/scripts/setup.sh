@@ -49,6 +49,15 @@ if ! command -v ffmpeg >/dev/null 2>&1; then
 fi
 
 if ! command -v uv >/dev/null 2>&1; then
+  # Agent 的非登录 shell 里 PATH 常常不含 uv 的安装目录，先补进 PATH 再判断，
+  # 否则会把已经装好的 uv 当成缺失，重复安装后仍然失败。
+  for candidate in "$HOME/.local/bin" "$HOME/.cargo/bin"; do
+    if [ -x "$candidate/uv" ]; then
+      export PATH="$candidate:$PATH"
+    fi
+  done
+fi
+if ! command -v uv >/dev/null 2>&1; then
   say "正在安装 Python 环境管理器 uv。"
   curl -LsSf https://astral.sh/uv/install.sh | sh
   export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"

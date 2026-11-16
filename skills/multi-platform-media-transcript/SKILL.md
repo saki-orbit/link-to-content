@@ -36,6 +36,13 @@ description: "整理视频、播客、文章和图文链接，生成本地逐字
 ## 文章和图文
 
 - 文章正文用已安装的 Crawl4AI 读取；图片文字用本地 RapidOCR。
+- 小红书图文笔记用一条命令完成渲染、取元数据、下载图片和本地 OCR：
+
+  ```bash
+  python "$SKILL_DIR/scripts/fetch_image_post.py" --url "<笔记链接>" --out "素材/<标题>"
+  ```
+
+  默认产物是 `metadata.json` 和 `ocr.md`；需要保留原图时加 `--keep-images`。视频类型的笔记改用 `scripts/process_media.py`。
 - 正文和 OCR 结果保存为本地文件。默认只把文件路径和处理状态交回对话。
 - 小红书主页批量归档交给 `xiaohongshu-creator-archive` Skill。
 
